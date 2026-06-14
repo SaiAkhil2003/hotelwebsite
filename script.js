@@ -78,14 +78,14 @@ function displayMenuItems() {
 
         <div class="price-box">
           <strong>${formatMoney(item.price)}</strong>
-          <button onclick="addItem('${item.name}')">Add</button>
+          <button onclick="addItem('${item.name}', this)">Add</button>
         </div>
       </div>
     `;
   });
 }
 
-function addItem(name) {
+function addItem(name, buttonElement) {
   const selectedMenuItem = menuItems.find(function (item) {
     return item.name === name;
   });
@@ -110,10 +110,30 @@ function addItem(name) {
   }
 
   updateCart();
+  showAddFeedback(buttonElement);
 
   document.getElementById("token").scrollIntoView({
     behavior: "smooth"
   });
+}
+
+function showAddFeedback(buttonElement) {
+  if (!buttonElement) {
+    return;
+  }
+
+  if (!buttonElement.dataset.defaultText) {
+    buttonElement.dataset.defaultText = buttonElement.innerText;
+  }
+
+  clearTimeout(buttonElement.addFeedbackTimer);
+  buttonElement.classList.add("added");
+  buttonElement.innerText = "Added";
+
+  buttonElement.addFeedbackTimer = setTimeout(function() {
+    buttonElement.classList.remove("added");
+    buttonElement.innerText = buttonElement.dataset.defaultText;
+  }, 900);
 }
 
 function increaseQuantity(name) {

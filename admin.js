@@ -1,6 +1,6 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydYYh8QKrWgQgCYyLKoeGZB5bijF3eLGzAcVfMgaGzDsU6H9tRuIP0YH-aGRdqoQEy/exec";
 
-const ADMIN_PIN = "1234";
+const SESSION_EXPIRED_MESSAGE = "Admin session expired. Please login again.";
 
 document.addEventListener("DOMContentLoaded", function () {
   checkSavedAdminAccess();
@@ -8,12 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function checkSavedAdminAccess() {
   const isUnlocked = sessionStorage.getItem("adminUnlocked");
+  const adminToken = getAdminToken();
 
-  if (isUnlocked === "yes") {
+  if (isUnlocked === "yes" && adminToken) {
     showAdminContent();
   } else {
-    document.getElementById("pinScreen").classList.remove("hidden");
-    document.getElementById("adminContent").classList.add("hidden");
+    clearAdminSession();
+    showPinScreen("");
   }
 }
 
@@ -22,16 +23,37 @@ function checkAdminPin(event) {
 
   const enteredPin = document.getElementById("adminPin").value.trim();
   const pinError = document.getElementById("pinError");
+  const submitButton = event.target.querySelector("button");
 
-  if (enteredPin === ADMIN_PIN) {
-    sessionStorage.setItem("adminUnlocked", "yes");
-    pinError.innerText = "";
-    showAdminContent();
-  } else {
-    pinError.innerText = "Incorrect PIN. Please try again.";
-    document.getElementById("adminPin").value = "";
-    document.getElementById("adminPin").focus();
-  }
+  pinError.innerText = "";
+  submitButton.disabled = true;
+  submitButton.innerText = "Checking...";
+
+  callApi({
+    action: "adminLogin",
+    pin: enteredPin
+  })
+    .then(function(response) {
+      if (response.status === "success" && response.adminToken) {
+        sessionStorage.setItem("adminUnlocked", "yes");
+        sessionStorage.setItem("adminToken", response.adminToken);
+        document.getElementById("adminPin").value = "";
+        pinError.innerText = "";
+        showAdminContent();
+      } else {
+        pinError.innerText = response.message || "Unable to login.";
+        document.getElementById("adminPin").value = "";
+        document.getElementById("adminPin").focus();
+      }
+    })
+    .catch(function(errorMessage) {
+      pinError.innerText = errorMessage;
+      document.getElementById("adminPin").focus();
+    })
+    .finally(function() {
+      submitButton.disabled = false;
+      submitButton.innerText = "Unlock Admin";
+    });
 }
 
 function showAdminContent() {
@@ -41,22 +63,40 @@ function showAdminContent() {
 }
 
 function logoutAdmin() {
-  sessionStorage.removeItem("adminUnlocked");
+  const adminToken = getAdminToken();
 
-  document.getElementById("adminContent").classList.add("hidden");
-  document.getElementById("pinScreen").classList.remove("hidden");
-  document.getElementById("adminPin").value = "";
-  document.getElementById("pinError").innerText = "";
+  clearAdminSession();
+  showPinScreen("");
+
+  if (adminToken) {
+    callApi({
+      action: "adminLogout",
+      adminToken: adminToken
+    }).catch(function() {});
+  }
 }
 
 function loadOrders() {
+  const adminToken = getAdminToken();
+
+  if (!adminToken) {
+    handleSessionExpired(SESSION_EXPIRED_MESSAGE);
+    return;
+  }
+
   document.getElementById("loadingText").innerText = "Loading orders...";
 
   callApi({
-    action: "getOrders"
+    action: "getOrders",
+    adminToken: adminToken
   })
     .then(function(response) {
       if (response.status !== "success") {
+        if (isSessionExpiredResponse(response)) {
+          handleSessionExpired(response.message);
+          return;
+        }
+
         alert(response.message || "Unable to load orders.");
         return;
       }
@@ -96,7 +136,7 @@ function displayOrders(orders) {
     return;
   }
 
-  orders.reverse().forEach(function(order) {
+  orders.slice().reverse().forEach(function(order) {
     const statusClass = getStatusClass(order.statusValue);
 
     tableBody.innerHTML += `
@@ -177,6 +217,13 @@ function getStatusButtons(rowNumber, currentStatus) {
 }
 
 function updateStatus(rowNumber, statusValue) {
+  const adminToken = getAdminToken();
+
+  if (!adminToken) {
+    handleSessionExpired(SESSION_EXPIRED_MESSAGE);
+    return;
+  }
+
   const confirmUpdate = confirm("Change order status to " + statusValue + "?");
 
   if (!confirmUpdate) {
@@ -186,12 +233,18 @@ function updateStatus(rowNumber, statusValue) {
   callApi({
     action: "updateStatus",
     rowNumber: rowNumber,
-    statusValue: statusValue
+    statusValue: statusValue,
+    adminToken: adminToken
   })
     .then(function(response) {
       if (response.status === "success") {
         loadOrders();
       } else {
+        if (isSessionExpiredResponse(response)) {
+          handleSessionExpired(response.message);
+          return;
+        }
+
         alert(response.message || "Unable to update status.");
       }
     })
@@ -228,6 +281,31 @@ function getStatusClass(statusValue) {
   return "status-pending";
 }
 
+function getAdminToken() {
+  return sessionStorage.getItem("adminToken");
+}
+
+function clearAdminSession() {
+  sessionStorage.removeItem("adminUnlocked");
+  sessionStorage.removeItem("adminToken");
+}
+
+function showPinScreen(message) {
+  document.getElementById("adminContent").classList.add("hidden");
+  document.getElementById("pinScreen").classList.remove("hidden");
+  document.getElementById("adminPin").value = "";
+  document.getElementById("pinError").innerText = message || "";
+}
+
+function handleSessionExpired(message) {
+  clearAdminSession();
+  showPinScreen(message || SESSION_EXPIRED_MESSAGE);
+}
+
+function isSessionExpiredResponse(response) {
+  return response && response.message === SESSION_EXPIRED_MESSAGE;
+}
+
 
 function callApi(paramsObject) {
   return new Promise(function(resolve, reject) {
@@ -236,7 +314,7 @@ function callApi(paramsObject) {
       return;
     }
 
-    const callbackName = "adminCallback_" + Date.now();
+    const callbackName = "adminCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
     const script = document.createElement("script");
 
     let completed = false;
