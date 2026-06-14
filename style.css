@@ -848,27 +848,134 @@ textarea {
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4;
+    margin: 10mm;
   }
 
-  #receiptCard,
-  #receiptCard * {
-    visibility: visible;
+  html,
+  body {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .header,
+  .hero,
+  .features,
+  .menu-section,
+  .token-section,
+  .footer,
+  .receipt-actions {
+    display: none !important;
+  }
+
+  #successBox {
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
   }
 
   #receiptCard {
-    position: absolute;
-    left: 0;
-    top: 0;
+    display: block !important;
+    position: static;
     width: 100%;
+    max-width: 100%;
+    padding: 14mm;
+    margin: 0;
+    background: #ffffff;
     box-shadow: none;
     border-radius: 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
-  .receipt-actions,
-  .header,
-  .footer {
-    display: none !important;
+  #receiptCard * {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .receipt-header {
+    margin-bottom: 10px;
+  }
+
+  .receipt-header h2 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .receipt-header p,
+  .restaurant-name p,
+  .receipt-row,
+  .receipt-item-row,
+  .receipt-instructions p,
+  .receipt-note {
+    font-size: 12px;
+  }
+
+  .restaurant-name {
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  .restaurant-name h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .token-highlight {
+    padding: 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+  }
+
+  .token-highlight span {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .token-highlight strong {
+    font-size: 30px;
+  }
+
+  .receipt-details {
+    padding: 10px 0;
+    margin-bottom: 12px;
+  }
+
+  .receipt-row {
+    margin-bottom: 8px;
+  }
+
+  .receipt-items {
+    margin-bottom: 12px;
+  }
+
+  .receipt-items h4,
+  .receipt-instructions h4 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .receipt-item-row {
+    padding: 6px 0;
+  }
+
+  .receipt-instructions {
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  .receipt-total {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 16px;
   }
 }
