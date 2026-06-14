@@ -340,7 +340,213 @@ function sendOrderToGoogleSheet(orderData) {
 }
 
 function printToken() {
-  window.print();
+  const receiptCard = document.getElementById("receiptCard");
+
+  if (!receiptCard) {
+    alert("Receipt not found.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank", "width=800,height=900");
+
+  if (!printWindow) {
+    alert("Please allow popups to print the token.");
+    return;
+  }
+
+  printWindow.document.open();
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Print Token</title>
+
+      <style>
+        * {
+          box-sizing: border-box;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        @page {
+          size: A4;
+          margin: 10mm;
+        }
+
+        body {
+          margin: 0;
+          padding: 0;
+          background: #ffffff;
+          color: #111827;
+        }
+
+        .receipt-card {
+          width: 100%;
+          max-width: 620px;
+          margin: 0 auto;
+          padding: 20px;
+          box-shadow: none;
+          border-radius: 0;
+          background: #ffffff;
+        }
+
+        .receipt-header {
+          text-align: center;
+          margin-bottom: 14px;
+        }
+
+        .receipt-header h2 {
+          color: #16823a;
+          font-size: 22px;
+          margin-bottom: 6px;
+        }
+
+        .receipt-header p {
+          color: #4b5563;
+          font-size: 13px;
+        }
+
+        .restaurant-name {
+          text-align: center;
+          padding: 12px;
+          background: #fff7ef;
+          border-radius: 10px;
+          margin-bottom: 14px;
+        }
+
+        .restaurant-name h3 {
+          color: #e85d04;
+          font-size: 20px;
+          margin-bottom: 5px;
+        }
+
+        .restaurant-name p {
+          color: #4b5563;
+          font-size: 13px;
+        }
+
+        .token-highlight {
+          text-align: center;
+          background: #e85d04;
+          color: #ffffff;
+          padding: 14px;
+          border-radius: 10px;
+          margin-bottom: 16px;
+        }
+
+        .token-highlight span {
+          display: block;
+          font-size: 12px;
+          margin-bottom: 4px;
+        }
+
+        .token-highlight strong {
+          font-size: 34px;
+          letter-spacing: 1px;
+        }
+
+        .receipt-details {
+          border-top: 1px dashed #dddddd;
+          border-bottom: 1px dashed #dddddd;
+          padding: 12px 0;
+          margin-bottom: 14px;
+        }
+
+        .receipt-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+          margin-bottom: 8px;
+          font-size: 13px;
+        }
+
+        .receipt-row:last-child {
+          margin-bottom: 0;
+        }
+
+        .receipt-row span {
+          color: #6b7280;
+        }
+
+        .receipt-row strong {
+          text-align: right;
+          color: #111827;
+        }
+
+        .receipt-items {
+          margin-bottom: 14px;
+        }
+
+        .receipt-items h4,
+        .receipt-instructions h4 {
+          font-size: 15px;
+          margin-bottom: 8px;
+        }
+
+        .receipt-item-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+          padding: 7px 0;
+          border-bottom: 1px solid #eeeeee;
+          font-size: 13px;
+        }
+
+        .receipt-instructions {
+          background: #fffaf4;
+          padding: 12px;
+          border-radius: 10px;
+          margin-bottom: 14px;
+        }
+
+        .receipt-instructions p {
+          font-size: 13px;
+          line-height: 1.4;
+        }
+
+        .receipt-total {
+          background: #111827;
+          color: #ffffff;
+          display: flex;
+          justify-content: space-between;
+          padding: 14px;
+          border-radius: 10px;
+          font-size: 16px;
+          margin-bottom: 12px;
+        }
+
+        .receipt-note {
+          text-align: center;
+          color: #6b7280;
+          font-size: 12px;
+        }
+
+        @media print {
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          .receipt-card {
+            page-break-inside: avoid;
+          }
+        }
+      </style>
+    </head>
+
+    <body>
+      ${receiptCard.outerHTML}
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  printWindow.onload = function () {
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 }
 
 function shareOnWhatsApp() {
