@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Restaurant Admin Dashboard</title>
+
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <section class="pin-screen" id="pinScreen">
+    <div class="pin-card">
+      <h1>Restaurant Admin</h1>
+      <p>Enter admin PIN to manage token orders</p>
+
+      <form onsubmit="checkAdminPin(event)">
+        <input
+          type="password"
+          id="adminPin"
+          placeholder="Enter Admin PIN"
+          maxlength="10"
+          required
+        />
+
+        <button type="submit">Unlock Admin</button>
+      </form>
+
+      <p class="pin-error" id="pinError"></p>
+    </div>
+  </section>
+
+  <main class="admin-content hidden" id="adminContent">
+
+    <header class="admin-header">
+      <div>
+        <h1>Restaurant Admin</h1>
+        <p>Manage customer food tokens</p>
+      </div>
+
+      <div class="admin-actions">
+        <button onclick="loadOrders()">Refresh Orders</button>
+        <button class="logout-btn" onclick="logoutAdmin()">Lock Admin</button>
+      </div>
+    </header>
+
+    <section class="summary-section">
+      <div class="summary-card">
+        <h3 id="pendingCount">0</h3>
+        <p>Pending</p>
+      </div>
+
+      <div class="summary-card">
+        <h3 id="preparingCount">0</h3>
+        <p>Preparing</p>
+      </div>
+
+      <div class="summary-card">
+        <h3 id="readyCount">0</h3>
+        <p>Ready</p>
+      </div>
+
+      <div class="summary-card">
+        <h3 id="deliveredCount">0</h3>
+        <p>Delivered</p>
+      </div>
+    </section>
+
+    <section class="orders-section">
+      <div class="section-title">
+        <h2>Live Token Orders</h2>
+        <p id="loadingText">Loading orders...</p>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Customer</th>
+              <th>Mobile</th>
+              <th>Type</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Instructions</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+
+      <div id="mobileOrders" class="mobile-orders"></div>
+    </section>
+
+  </main>
+
+  <script src="admin.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Smart Restaurant Token System</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-icon">🍽️</span>
+        <h2>Smart Restaurant</h2>
+      </div>
+
+      <nav class="navbar" id="navbar">
+        <a href="#home" onclick="closeMenu()">Home</a>
+        <a href="#menu" onclick="closeMenu()">Menu</a>
+        <a href="#token" onclick="closeMenu()">Create Token</a>
+        <a href="#contact" onclick="closeMenu()">Contact</a>
+      </nav>
+
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="hero-container">
+      <div class="hero-content">
+        <p class="tagline">Fast • Simple • No Login Required</p>
+
+        <h1>Create Your Food Token Easily</h1>
+
+        <p class="hero-text">
+          View the menu, select your food items, and generate your restaurant token within seconds.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#menu" class="btn primary-btn">View Menu</a>
+          <a href="#token" class="btn outline-btn">Create Token</a>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <p class="card-label">Today’s Special</p>
+        <h3>Chicken Biryani</h3>
+        <strong>$13.99</strong>
+        <span>Estimated wait time: 20 mins</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature-box">
+      <h3>No Login</h3>
+      <p>Customers can create tokens quickly without registration.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>Easy Menu</h3>
+      <p>Food items are clearly displayed with price and category.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>Instant Token</h3>
+      <p>Token number is generated immediately after order confirmation.</p>
+    </div>
+  </section>
+
+  <section class="menu-section" id="menu">
+    <div class="section-title">
+      <p>Our Menu</p>
+      <h2>Select Your Food Items</h2>
+    </div>
+
+    <div class="menu-grid" id="menuGrid"></div>
+  </section>
+
+  <section class="token-section" id="token">
+    <div class="section-title">
+      <p>Create Token</p>
+      <h2>Confirm Your Order</h2>
+    </div>
+
+    <div class="token-container">
+
+      <div class="cart-box">
+        <h3>Selected Items</h3>
+
+        <div id="cartItems" class="cart-items">
+          <p class="empty-cart">No items selected yet.</p>
+        </div>
+
+        <div class="total-box">
+          <span>Total Amount</span>
+          <strong id="totalAmount">$0.00</strong>
+        </div>
+      </div>
+
+      <form class="token-form" onsubmit="createToken(event)">
+        <label for="customerName">Customer Name</label>
+        <input
+          type="text"
+          id="customerName"
+          placeholder="Enter your name"
+          required
+        />
+
+        <label for="mobileNumber">Mobile Number</label>
+        <input
+          type="tel"
+          id="mobileNumber"
+          placeholder="Enter mobile number"
+          required
+        />
+
+        <label for="orderType">Order Type</label>
+        <select id="orderType" required>
+          <option value="">Select order type</option>
+          <option value="Dine In">Dine In</option>
+          <option value="Takeaway">Takeaway</option>
+        </select>
+
+        <label for="instructions">Special Instructions</label>
+        <textarea
+          id="instructions"
+          placeholder="Example: Less spicy, extra sauce"
+        ></textarea>
+
+        <button type="submit" class="submit-btn">Create Token</button>
+      </form>
+
+    </div>
+  </section>
+
+  <section class="success-box" id="successBox">
+    <div class="receipt-card" id="receiptCard">
+      <div class="receipt-header">
+        <h2>✅ Token Created Successfully</h2>
+        <p>Your order has been received.</p>
+      </div>
+
+      <div class="restaurant-name">
+        <h3>Smart Restaurant</h3>
+        <p>123 Main Street, Dallas, TX, USA</p>
+      </div>
+
+      <div class="token-highlight">
+        <span>Token No</span>
+        <strong id="tokenNumber"></strong>
+      </div>
+
+      <div class="receipt-details">
+        <div class="receipt-row">
+          <span>Name</span>
+          <strong id="resultName"></strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Mobile</span>
+          <strong id="resultMobile"></strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Order Type</span>
+          <strong id="resultOrderType"></strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Estimated Time</span>
+          <strong>20 minutes</strong>
+        </div>
+      </div>
+
+      <div class="receipt-items">
+        <h4>Ordered Items</h4>
+        <div id="resultItems"></div>
+      </div>
+
+      <div class="receipt-instructions">
+        <h4>Special Instructions</h4>
+        <p id="resultInstructions">None</p>
+      </div>
+
+      <div class="receipt-total">
+        <span>Total Amount</span>
+        <strong id="resultTotal"></strong>
+      </div>
+
+      <p class="receipt-note">
+        Please show this token number at the restaurant counter.
+      </p>
+    </div>
+
+    <div class="receipt-actions">
+      <button onclick="printToken()" class="action-btn print-btn">Print Token</button>
+      <button onclick="shareOnWhatsApp()" class="action-btn whatsapp-btn">Share on WhatsApp</button>
+      <button onclick="newToken()" class="action-btn new-btn">Create New Token</button>
+    </div>
+  </section>
+
+  <footer class="footer" id="contact">
+    <h3>Smart Restaurant</h3>
+    <p>123 Main Street, Dallas, TX, USA</p>
+    <p>Phone: +1 (555) 123-4567</p>
+    <p>Open: 9:00 AM to 10:00 PM</p>
+  </footer>
+
+  <script src="script.js?v=5"></script>
+</body>
+</html>
